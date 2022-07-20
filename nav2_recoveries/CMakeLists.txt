@@ -78,6 +78,17 @@ ament_target_dependencies(nav2_wait_recovery
 # prevent pluginlib from using boost
 target_compile_definitions(nav2_wait_recovery PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
+
+add_library(nav2_drive_on_heading_behavior SHARED
+  plugins/drive_on_heading.cpp
+)
+
+ament_target_dependencies(nav2_drive_on_heading_behavior
+  ${dependencies}
+)
+
+target_compile_definitions(nav2_drive_on_heading_behavior PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+
 pluginlib_export_plugin_description_file(nav2_core recovery_plugin.xml)
 
 # Library
@@ -108,6 +119,7 @@ install(TARGETS ${library_name}
                 nav2_backup_recovery
                 nav2_spin_recovery
                 nav2_wait_recovery
+                nav2_drive_on_heading_behavior
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -137,6 +149,7 @@ ament_export_libraries(${library_name}
   nav2_backup_recovery
   nav2_spin_recovery
   nav2_wait_recovery
+  nav2_drive_on_heading_behavior
 )
 ament_export_dependencies(${dependencies})
 ament_package()

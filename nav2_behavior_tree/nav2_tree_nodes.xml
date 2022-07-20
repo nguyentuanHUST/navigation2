@@ -12,6 +12,12 @@
       <input_port name="backup_speed">Speed at which to backup</input_port>
     </Action>
 
+    <Action ID="DriveOnHeading">
+      <input_port name="dist_to_travel">Distance to travel</input_port>
+      <input_port name="speed">Speed at which to travel</input_port>
+      <input_port name="time_allowance">Allowed time for driving on heading</input_port>
+    </Action>
+
     <Action ID="ClearEntireCostmap">
       <input_port name="service_name">Service name</input_port>
     </Action>

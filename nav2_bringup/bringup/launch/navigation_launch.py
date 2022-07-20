@@ -32,11 +32,13 @@ def generate_launch_description():
     autostart = LaunchConfiguration('autostart')
     params_file = LaunchConfiguration('params_file')
 
-    lifecycle_nodes = ['controller_server',
+    lifecycle_nodes = [
+                        'controller_server',
                        'planner_server',
                        'recoveries_server',
                        'bt_navigator',
-                       'waypoint_follower']
+                    #    'waypoint_follower'
+                       ]
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
     # In case of the transforms (tf), currently, there doesn't seem to be a better alternative
@@ -84,7 +86,8 @@ def generate_launch_description():
             executable='controller_server',
             output='screen',
             parameters=[configured_params],
-            remappings=remappings),
+            remappings=remappings,
+            arguments=['--ros-args', '--log-level', 'info']),
 
         Node(
             package='nav2_planner',
@@ -108,7 +111,8 @@ def generate_launch_description():
             name='bt_navigator',
             output='screen',
             parameters=[configured_params],
-            remappings=remappings),
+            remappings=remappings,
+            arguments=['--ros-args', '--log-level', 'info']),
 
         Node(
             package='nav2_waypoint_follower',

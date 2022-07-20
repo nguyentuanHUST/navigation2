@@ -64,7 +64,8 @@ BtNavigator::BtNavigator()
     "nav2_remove_passed_goals_action_bt_node",
     "nav2_planner_selector_bt_node",
     "nav2_controller_selector_bt_node",
-    "nav2_goal_checker_selector_bt_node"
+    "nav2_goal_checker_selector_bt_node",
+    "nav2_drive_on_heading_bt_node"
   };
 
   declare_parameter("plugin_lib_names", plugin_libs);
@@ -99,7 +100,15 @@ BtNavigator::on_configure(const rclcpp_lifecycle::State & /*state*/)
   auto plugin_lib_names = get_parameter("plugin_lib_names").as_string_array();
 
   pose_navigator_ = std::make_unique<nav2_bt_navigator::NavigateToPoseNavigator>();
+  RCLCPP_INFO(get_logger(), "Start action server %s", pose_navigator_->getName().c_str());
+
   poses_navigator_ = std::make_unique<nav2_bt_navigator::NavigateThroughPosesNavigator>();
+  RCLCPP_INFO(get_logger(), "Start action server %s", poses_navigator_->getName().c_str());
+
+  go_zigzag_ = std::make_unique<nav2_bt_navigator::GoZigZag>();
+  RCLCPP_INFO(get_logger(), "Start action server... %s", go_zigzag_->getName().c_str());
+
+  clean_rack_ = std::make_unique<nav2_bt_navigator::CleanRackNavigator>();
 
   nav2_bt_navigator::FeedbackUtils feedback_utils;
   feedback_utils.tf = tf_;
@@ -122,6 +131,18 @@ BtNavigator::on_configure(const rclcpp_lifecycle::State & /*state*/)
     return nav2_util::CallbackReturn::FAILURE;
   }
 
+  if (!go_zigzag_->on_configure(
+      shared_from_this(), plugin_lib_names, feedback_utils, &plugin_muxer_, odom_smoother_))
+  {
+    return nav2_util::CallbackReturn::FAILURE;
+  }
+
+  if (!clean_rack_->on_configure(
+      shared_from_this(), plugin_lib_names, feedback_utils, &plugin_muxer_, odom_smoother_))
+  {
+    return nav2_util::CallbackReturn::FAILURE;
+  }
+
   return nav2_util::CallbackReturn::SUCCESS;
 }
 
@@ -130,10 +151,19 @@ BtNavigator::on_activate(const rclcpp_lifecycle::State & /*state*/)
 {
   RCLCPP_INFO(get_logger(), "Activating");
 
-  if (!poses_navigator_->on_activate() || !pose_navigator_->on_activate()) {
+  // if (!poses_navigator_->on_activate() || !pose_navigator_->on_activate() 
+  // ||!go_zigzag_->on_activate()) {
+  //   return nav2_util::CallbackReturn::FAILURE;
+  // }
+  bool success = true;
+  success = poses_navigator_->on_activate();
+  success = pose_navigator_->on_activate();
+  success = go_zigzag_->on_activate();
+  success = clean_rack_->on_activate();
+  RCLCPP_INFO(get_logger(), "Finish activating %d", success );
+  if(success) {
     return nav2_util::CallbackReturn::FAILURE;
   }
-
   // create bond connection
   createBond();
 
@@ -145,7 +175,8 @@ BtNavigator::on_deactivate(const rclcpp_lifecycle::State & /*state*/)
 {
   RCLCPP_INFO(get_logger(), "Deactivating");
 
-  if (!poses_navigator_->on_deactivate() || !pose_navigator_->on_deactivate()) {
+  if (!poses_navigator_->on_deactivate() || !pose_navigator_->on_deactivate() ||
+    !go_zigzag_->on_deactivate() || !clean_rack_->on_deactivate()) {
     return nav2_util::CallbackReturn::FAILURE;
   }
 
@@ -164,12 +195,14 @@ BtNavigator::on_cleanup(const rclcpp_lifecycle::State & /*state*/)
   tf_listener_.reset();
   tf_.reset();
 
-  if (!poses_navigator_->on_cleanup() || !pose_navigator_->on_cleanup()) {
+  if (!poses_navigator_->on_cleanup() || !pose_navigator_->on_cleanup() || 
+    !go_zigzag_->on_cleanup() || !clean_rack_->on_cleanup()) {
     return nav2_util::CallbackReturn::FAILURE;
   }
 
   poses_navigator_.reset();
   pose_navigator_.reset();
+  go_zigzag_.reset();
 
   RCLCPP_INFO(get_logger(), "Completed Cleaning up");
   return nav2_util::CallbackReturn::SUCCESS;

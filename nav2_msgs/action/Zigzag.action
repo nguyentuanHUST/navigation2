@@ -1,0 +1,11 @@
+#goal definition
+uint8 nums
+float32 x
+float32 y
+float32 speed
+---
+#result definition
+std_msgs/Empty result
+---
+#feedback
+float32 speed

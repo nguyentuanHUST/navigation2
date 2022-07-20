@@ -27,6 +27,8 @@
 #include "tf2_ros/create_timer_ros.h"
 #include "nav2_bt_navigator/navigators/navigate_to_pose.hpp"
 #include "nav2_bt_navigator/navigators/navigate_through_poses.hpp"
+#include "nav2_bt_navigator/navigators/gozigzag.hpp"
+#include "nav2_bt_navigator/navigators/clean_rack.hpp"
 
 namespace nav2_bt_navigator
 {
@@ -85,8 +87,9 @@ protected:
 
   // To handle all the BT related execution
   std::unique_ptr<nav2_bt_navigator::Navigator<nav2_msgs::action::NavigateToPose>> pose_navigator_;
-  std::unique_ptr<nav2_bt_navigator::Navigator<nav2_msgs::action::NavigateThroughPoses>>
-  poses_navigator_;
+  std::unique_ptr<nav2_bt_navigator::Navigator<nav2_msgs::action::NavigateThroughPoses>> poses_navigator_;
+  std::unique_ptr<nav2_bt_navigator::Navigator<nav2_msgs::action::Zigzag>> go_zigzag_;
+  std::unique_ptr<nav2_bt_navigator::Navigator<nav2_msgs::action::NavigateToPose>> clean_rack_;
   nav2_bt_navigator::NavigatorMuxer plugin_muxer_;
 
   // Odometry smoother object

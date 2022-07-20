@@ -16,4 +16,10 @@
 	    <description></description>
 	  </class>
 	</library>
+
+	<library path="nav2_drive_on_heading_behavior">
+	  <class name="nav2_recoveries/DriveOnHeading" type="nav2_recoveries::DriveOnHeading&lt;&gt;" base_class_type="nav2_core::Recovery">
+	    <description></description>
+	  </class>
+	</library>
 </class_libraries>

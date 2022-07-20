@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="MainTree">
+        <Repeat num_cycles="{nums}">
+            <Sequence>
+                <DriveOnHeading dist_to_travel="{x}" speed="{speed}" time_allowance="100"/>
+                <Spin spin_dist="-1.507"/>
+                <DriveOnHeading dist_to_travel="{y}" speed="{speed}" time_allowance="100"/>
+                <Spin spin_dist="-1.507"/>
+                <DriveOnHeading dist_to_travel="{x}" speed="{speed}" time_allowance="100"/>
+                <Spin spin_dist="1.507"/>
+                <DriveOnHeading dist_to_travel="{y}" speed="{speed}" time_allowance="100"/>
+                <Spin spin_dist="1.507"/>
+            </Sequence>
+        </Repeat>
+    </BehaviorTree>
+</root>
+

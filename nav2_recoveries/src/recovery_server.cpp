@@ -25,8 +25,9 @@ namespace recovery_server
 RecoveryServer::RecoveryServer()
 : LifecycleNode("recoveries_server", "", true),
   plugin_loader_("nav2_core", "nav2_core::Recovery"),
-  default_ids_{"spin", "backup", "wait"},
-  default_types_{"nav2_recoveries/Spin", "nav2_recoveries/BackUp", "nav2_recoveries/Wait"}
+  default_ids_{"spin", "backup", "wait", "drive_on_heading"},
+  default_types_{"nav2_recoveries/Spin", "nav2_recoveries/BackUp"
+    , "nav2_recoveries/Wait", "nav2_recoveries/DriveOnHeading"}
 {
   declare_parameter(
     "costmap_topic",

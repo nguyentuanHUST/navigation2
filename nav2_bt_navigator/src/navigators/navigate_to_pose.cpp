@@ -47,10 +47,10 @@ NavigateToPoseNavigator::configure(
 
   self_client_ = rclcpp_action::create_client<ActionT>(node, getName());
 
-  goal_sub_ = node->create_subscription<geometry_msgs::msg::PoseStamped>(
-    "goal_pose",
-    rclcpp::SystemDefaultsQoS(),
-    std::bind(&NavigateToPoseNavigator::onGoalPoseReceived, this, std::placeholders::_1));
+  // goal_sub_ = node->create_subscription<geometry_msgs::msg::PoseStamped>(
+  //   "goal_pose",
+  //   rclcpp::SystemDefaultsQoS(),
+  //   std::bind(&NavigateToPoseNavigator::onGoalPoseReceived, this, std::placeholders::_1));
   return true;
 }
 
@@ -203,8 +203,8 @@ void
 NavigateToPoseNavigator::initializeGoalPose(ActionT::Goal::ConstSharedPtr goal)
 {
   RCLCPP_INFO(
-    logger_, "Begin navigating from current location to (%.2f, %.2f)",
-    goal->pose.pose.position.x, goal->pose.pose.position.y);
+    logger_, "Begin navigating from current location to (%.2f, %.2f) frame %s %s",
+    goal->pose.pose.position.x, goal->pose.pose.position.y, goal->pose.header.frame_id.c_str(), goal_blackboard_id_.c_str());
 
   // Reset state for new action feedback
   start_time_ = clock_->now();
@@ -218,6 +218,7 @@ NavigateToPoseNavigator::initializeGoalPose(ActionT::Goal::ConstSharedPtr goal)
 void
 NavigateToPoseNavigator::onGoalPoseReceived(const geometry_msgs::msg::PoseStamped::SharedPtr pose)
 {
+  RCLCPP_INFO(logger_, "Goal callback navigate to point");
   ActionT::Goal goal;
   goal.pose = *pose;
   self_client_->async_send_goal(goal);
