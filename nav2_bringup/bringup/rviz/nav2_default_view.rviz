@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /TF1/Frames1
         - /TF1/Tree1
       Splitter Ratio: 0.5833333134651184
     Tree Height: 401
@@ -73,49 +72,51 @@ Visualization Manager:
       Frames:
         All Enabled: false
         base_footprint:
-          Value: true
+          Value: false
         base_link:
-          Value: true
+          Value: false
         base_scan:
+          Value: false
+        base_wheel:
           Value: true
         camera_color_frame:
-          Value: true
+          Value: false
         camera_color_optical_frame:
-          Value: true
+          Value: false
         camera_depth_frame:
-          Value: true
+          Value: false
         camera_depth_optical_frame:
-          Value: true
+          Value: false
         camera_left_ir_frame:
-          Value: true
+          Value: false
         camera_left_ir_optical_frame:
-          Value: true
+          Value: false
         camera_link:
-          Value: true
+          Value: false
         camera_right_ir_frame:
-          Value: true
+          Value: false
         camera_right_ir_optical_frame:
-          Value: true
+          Value: false
         left_wheel_1:
-          Value: true
+          Value: false
         leg_0:
-          Value: true
+          Value: false
         leg_1:
-          Value: true
+          Value: false
         leg_2:
-          Value: true
+          Value: false
         leg_3:
-          Value: true
+          Value: false
         lidar_1:
-          Value: true
+          Value: false
         map:
-          Value: true
+          Value: false
         odom:
-          Value: true
+          Value: false
         realsense_link:
-          Value: true
+          Value: false
         right_wheel_1:
-          Value: true
+          Value: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -127,6 +128,8 @@ Visualization Manager:
             odom:
               base_footprint:
                 base_link:
+                  base_wheel:
+                    {}
                   left_wheel_1:
                     {}
                   lidar_1:
@@ -461,8 +464,8 @@ Visualization Manager:
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 0.9317677617073059
-            Min Value: 0.013053957372903824
+            Max Value: 0.9543388485908508
+            Min Value: 0.020395053550601006
             Value: true
           Axis: Z
           Channel Name: intensity
@@ -492,7 +495,7 @@ Visualization Manager:
           Use Fixed Frame: true
           Use rainbow: true
           Value: true
-      Enabled: false
+      Enabled: true
       Name: Controller
     - Class: rviz_common/Group
       Displays:
@@ -586,6 +589,21 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /path_from_feet
       Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/PointStamped
+      Color: 204; 41; 204
+      Enabled: true
+      History Length: 1
+      Name: PointStamped
+      Radius: 0.20000000298023224
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /lookahead_point
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -633,11 +651,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 143.83665466308594
+      Scale: 91.32491302490234
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 6.867936134338379
-      Y: 1.0676062107086182
+      X: 8.303297996520996
+      Y: 0.46542125940322876
     Saved: ~
 Window Geometry:
   Displays:

@@ -4,17 +4,17 @@
     <BehaviorTree ID="BehaviorTree">
         <SequenceStar>
             <!-- <Action ID="NavigateToPose" goal="{start_point}"/> -->
-            <PipelineSequence name="NavigateWithReplanning">
+            <!-- <PipelineSequence name="NavigateWithReplanning">
                 <RateController hz="1.0">
                     <ComputePathToPose goal="{start_point}" path="{path}" planner_id="GridBased"/>
                 </RateController>
                 <FollowPath path="{path}"  controller_id="Pursuit"/>
-            </PipelineSequence>
+            </PipelineSequence> -->
             <!-- <Action ID="OffObstacleAvoidance"/> -->
             <Decorator ID="FeetDetector" goal="{next_goal}">
                 <PipelineSequence name="NavigateWithReplanning">
                     <RateController hz="1.0">
-                        <ComputePathToPose goal="{next_goal}" path="{path}" planner_id="GridBased"/>
+                        <ComputePathToPose goal="{next_goal}" path="{path}" planner_id="StraightLine"/>
                     </RateController>
                     <FollowPath path="{path}"  controller_id="Pursuit"/>
                 </PipelineSequence>

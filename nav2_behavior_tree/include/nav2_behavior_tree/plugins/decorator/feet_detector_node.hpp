@@ -27,6 +27,8 @@
 #include "nav_msgs/msg/path.hpp"
 
 #include "rclcpp/rclcpp.hpp"
+#include "rcl_interfaces/srv/set_parameters.hpp"
+#include "rcl_interfaces/srv/get_parameters.hpp"
 
 namespace nav2_behavior_tree
 {
@@ -76,6 +78,9 @@ private:
   void callback_updated_leg2(const geometry_msgs::msg::PointStamped::SharedPtr msg);
   void callback_updated_leg3(const geometry_msgs::msg::PointStamped::SharedPtr msg);
 
+  void reconfigInflationRadius(double radius);
+  double getInflationRadius();
+
   // rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr leg0_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr leg1_sub_;
@@ -102,6 +107,7 @@ private:
   double robot_length_;
   double right_side_offset_;
   double left_side_offset_;
+  double inflation_radius_;
 
   rclcpp::Node::SharedPtr node_;
   rclcpp::CallbackGroup::SharedPtr callback_group_;
@@ -110,6 +116,9 @@ private:
   double transform_tolerance_;
   std::string global_frame_;
   std::string robot_base_frame_;
+
+  rclcpp::Client<rcl_interfaces::srv::SetParameters>::SharedPtr set_params_client_;
+  rclcpp::Client<rcl_interfaces::srv::GetParameters>::SharedPtr get_params_client_;
 
 };
 
