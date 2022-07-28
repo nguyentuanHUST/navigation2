@@ -250,7 +250,11 @@ namespace nav2_behavior_tree
         goal.header.stamp = node_->get_clock()->now();
         goal.header.frame_id = global_frame_;
         setOutput("goal", goal);
+        if(i == 2) {
+          setOutput("is_not_corner", false);
+        }
         child_node_->executeTick();
+        setOutput("is_not_corner", true);
         while (child_node_->waitValidStatus() == BT::NodeStatus::RUNNING)
         {
           child_node_->executeTick();

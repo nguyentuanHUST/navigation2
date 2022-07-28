@@ -11,8 +11,12 @@
                 <FollowPath path="{path}"  controller_id="Pursuit"/>
             </PipelineSequence> -->
             <!-- <Action ID="OffObstacleAvoidance"/> -->
-            <Decorator ID="FeetDetector" goal="{next_goal}">
+            <Decorator ID="FeetDetector" goal="{next_goal}" is_not_corner="{not_corner}">
                 <PipelineSequence name="NavigateWithReplanning">
+                    <Fallback name="CheckIfCornerThenGoReverse">
+                        <IsNotCorner is_not_corner="{not_corner}"/>
+                        <BackUp backup_dist="0.1" backup_speed="0.2"/>
+                    </Fallback>
                     <RateController hz="1.0">
                         <ComputePathToPose goal="{next_goal}" path="{path}" planner_id="StraightLine"/>
                     </RateController>

@@ -59,6 +59,7 @@ public:
       BT::OutputPort<geometry_msgs::msg::PoseStamped>(
         "goal",
         "Goal to navigate to"),
+      BT::OutputPort<bool>("is_not_corner", "is_not_corner"),
     };
   }
 
