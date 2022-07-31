@@ -4,23 +4,23 @@
     <BehaviorTree ID="BehaviorTree">
         <SequenceStar>
             <!-- <Action ID="NavigateToPose" goal="{start_point}"/> -->
-            <!-- <PipelineSequence name="NavigateWithReplanning">
+            <PipelineSequence name="NavigateWithReplanning">
                 <RateController hz="1.0">
                     <ComputePathToPose goal="{start_point}" path="{path}" planner_id="GridBased"/>
                 </RateController>
-                <FollowPath path="{path}"  controller_id="Pursuit"/>
-            </PipelineSequence> -->
+                <FollowPath path="{path}"  controller_id="Pursuit" goal_checker_id="general_goal_checker_precise"/>
+            </PipelineSequence>
             <!-- <Action ID="OffObstacleAvoidance"/> -->
-            <Decorator ID="FeetDetector" goal="{next_goal}" is_not_corner="{not_corner}">
+            <Decorator ID="FeetDetector" start="{start}" goal="{next_goal}" is_not_corner="{not_corner}">
                 <PipelineSequence name="NavigateWithReplanning">
+                    <RateController hz="1.0">
+                        <ComputePathToPose goal="{next_goal}" start="{start}" path="{path}" planner_id="StraightLine"/>
+                    </RateController>
+                    <FollowPath path="{path}"  controller_id="Pursuit" goal_checker_id="general_goal_checker"/>
                     <Fallback name="CheckIfCornerThenGoReverse">
                         <IsNotCorner is_not_corner="{not_corner}"/>
                         <BackUp backup_dist="0.1" backup_speed="0.2"/>
-                    </Fallback>
-                    <RateController hz="1.0">
-                        <ComputePathToPose goal="{next_goal}" path="{path}" planner_id="StraightLine"/>
-                    </RateController>
-                    <FollowPath path="{path}"  controller_id="Pursuit"/>
+                    </Fallback>                
                 </PipelineSequence>
             </Decorator>
             <!-- <Action ID="OnObstacleAvoidance"/> -->

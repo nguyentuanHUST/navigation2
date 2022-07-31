@@ -21,8 +21,8 @@ namespace nav2_behavior_tree
 		static BT::PortsList providedPorts()
 		{
 			return {
-				BT::InputPort<bool>("is_not_corner", 
-					"Check whether is corner of the rack"),
+				BT::InputPort<bool>("is_not_corner", true, 
+					"Check whether is corner of the rack")
 			};
 		}
 	};

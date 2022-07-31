@@ -127,8 +127,10 @@ namespace nav2_behavior_tree
         tf2::Vector3 leg10_v(leg0_.point.x - leg1_.point.x, leg0_.point.y - leg1_.point.y, 0);
         tf2::Vector3 leg21_v(leg1_.point.x - leg2_.point.x, leg1_.point.y - leg2_.point.y, 0);
         tf2::Vector3 leg30_v(leg0_.point.x - leg3_.point.x, leg0_.point.y - leg3_.point.y, 0);
+        RCLCPP_INFO(node_->get_logger(),"leg30 %f %f %f", leg30_v.getX(),leg30_v.getY(),leg30_v.getZ() );
         tf2::Vector3 leg2_v(leg2_.point.x, leg2_.point.y, 0);
-        
+        tf2::Vector3 leg1_v(leg1_.point.x, leg1_.point.y, 0);
+        double yaw = tf2::tf2Angle(leg23_v, tf2::Vector3(1, 0, 0));
         std::vector<tf2::Transform> below_goals_in_legs_frame;
         std::vector<tf2::Transform> beyond_goals_in_legs_frame;
         std::vector<tf2::Transform> cobweb_goals;
@@ -143,77 +145,56 @@ namespace nav2_behavior_tree
         // Cobweb cleaning
         {
           double safety = 0.06;
-          // tf2::Vector3 leg_2t = tf2::Transform::getIdentity();
-          tf2::Vector3 delta = leg23_v / leg23_v.length() *  (x3 + safety);
-          // tf2::Vector3 delta_2 = leg21_v / leg21_v.length() * right_side_offset_;
-          // tf_2.setOrigin(leg2_ + delta);
-          // cobweb_goals.push_back(tf_2);
-          // tf2::Transform tf_3 = tf2::Transform::getIdentity();
-          tf2::Vector3 delta_ = leg23_v - delta;
-          // delta_2 = leg30_v / leg30_v.length() * right_side_offset_;
-          // tf_3.setOrigin(leg2_ + delta);
-          // cobweb_goals.push_back(tf_3);
-          // cobweb_goals.push_back(tf_2);
-          // tf2::Transform tf_1 = tf2::Transform::getIdentity();
-          // delta = leg10_v / leg10_v.length() *  (x3 + safety);
-          // delta_2 = - leg21_v / leg21_v.length() * left_side_offset_;
-          // tf_1.setOrigin(leg1_ + delta + delta_2);
-          // cobweb_goals.push_back(tf_1);
-          // tf2::Transform tf_0 = tf2::Transform::getIdentity();
-          // delta = leg10_v - delta;
-          // tf.setOrigin(leg1_ + delta);
-          // cobweb_goals.push_back(tf_0);
-          // tf.setOrigin(tf2::Vector3(x3 + safety, table_width_ - left_side_offset_, 0));
-          // tf.setRotation(tf2::Quaternion(tf2::Vector3(0, 0, 1), M_PI));
-          // cobweb_goals.push_back(tf_1);
+          tf2::Vector3 delta_23_s = leg23_v / leg23_v.length() *  (x3 + safety);
+          tf2::Vector3 delta_23_l = leg23_v - delta_23_s;
+          tf2::Vector3 delta_10_s = leg10_v / leg10_v.length() *  (x3 + safety);
+          tf2::Vector3 delta_10_l = leg10_v - delta_10_s;
           while (true)
           {
             double l = right_side_offset_ + robot_width_ * k;
             tf2::Vector3 delta_2 = leg21_v / leg21_v.length() * l;
             tf2::Vector3 delta_3 = leg30_v / leg30_v.length() * l;
+            RCLCPP_INFO(node_->get_logger(),"delta_3 %f %f %f", delta_3.getX(),delta_3.getY(),delta_3.getZ() );
             if (l > leg21_v.length() - left_side_offset_)
               break;
             tf2::Transform tf = tf2::Transform::getIdentity();
             // if(k == 0) {
             //   tf.setOrigin(tf2::Vector3(0.15 + 0.06, l, 0));
             // } else {
-            tf.setOrigin( leg2_v + delta + delta_2);
+            tf.setOrigin( leg2_v + delta_23_s + delta_2);
+            tf.setRotation(tf2::Quaternion(tf2::Vector3(0, 0, 1), yaw));
             // }
             below_goals_in_legs_frame.push_back(tf);
-            tf.setOrigin(leg2_v + delta_ + delta_3);
+            tf.setOrigin(leg2_v + delta_23_l + delta_3);
             beyond_goals_in_legs_frame.push_back(tf);
             k++;
-          }        
+          }
+          {
+            tf2::Transform tf = tf2::Transform::getIdentity();
+            tf.setRotation(tf2::Quaternion(tf2::Vector3(0, 0, 1), yaw));
+            tf.setOrigin(leg2_v + delta_23_s);
+            cobweb_goals.push_back(tf);
+            tf.setOrigin(leg2_v + delta_23_l);
+            cobweb_goals.push_back(tf);
+            tf.setOrigin(leg2_v + delta_23_s);
+            cobweb_goals.push_back(tf);
+            tf.setOrigin(leg1_v + delta_10_s);
+            cobweb_goals.push_back(tf);
+            tf.setOrigin(leg1_v + delta_10_l);
+            cobweb_goals.push_back(tf);
+            tf.setOrigin(leg1_v + delta_10_s);
+            cobweb_goals.push_back(tf);
+          }   
         }
 
-
-        // for (unsigned int i = 0; i < below_goals_in_legs_frame.size();)
-        // {
-        //   below_goals_in_legs_frame[i].setRotation(tf2::Quaternion(tf2::Vector3(0, 0, 1), 0));
-        //   i++;
-        //   if (i >= below_goals_in_legs_frame.size())
-        //     break;
-        //   below_goals_in_legs_frame[i].setRotation(tf2::Quaternion(tf2::Vector3(0, 0, 1), M_PI / 2));
-        //   i++;
-        // }
-        // for (unsigned int i = 0; i < beyond_goals_in_legs_frame.size();)
-        // {
-        //   beyond_goals_in_legs_frame[i].setRotation(tf2::Quaternion(tf2::Vector3(0, 0, 1), M_PI / 2));
-        //   i++;
-        //   if (i >= beyond_goals_in_legs_frame.size())
-        //     break;
-        //   beyond_goals_in_legs_frame[i].setRotation(tf2::Quaternion(tf2::Vector3(0, 0, 1), M_PI));
-        //   i++;
-        // }
-        // TODO: Calculate list goal from table size and robot size
         nav_msgs::msg::Path path;
-        // for (unsigned int i = 0; i < cobweb_goals.size(); i++)
-        // {
-        //   geometry_msgs::msg::PoseStamped goal;
-        //   goal.header.frame_id = global_frame_;
-        //   tf2::toMsg(cobweb_goals[i], goal.pose);
-        //   goals_.push_back(goal);
-        // }
+        for (unsigned int i = 0; i < cobweb_goals.size(); i++)
+        {
+          geometry_msgs::msg::PoseStamped goal;
+          goal.header.frame_id = global_frame_;
+          tf2::toMsg(cobweb_goals[i], goal.pose);
+          goals_.push_back(goal);
+        }
         for (unsigned int i = 0; i < below_goals_in_legs_frame.size();)
         {
           geometry_msgs::msg::PoseStamped goal;
@@ -224,7 +205,6 @@ namespace nav2_behavior_tree
           tf = beyond_goals_in_legs_frame[i];
           tf2::toMsg(tf, goal.pose);
           goals_.push_back(goal);
-
           if (++i >= below_goals_in_legs_frame.size())
             break;
           tf = beyond_goals_in_legs_frame[i];
@@ -236,6 +216,13 @@ namespace nav2_behavior_tree
           ++i;
         }
         RCLCPP_INFO(node_->get_logger(), "Goals size %d", static_cast<int>(goals_.size()));
+        go_backup_.resize(goals_.size());
+        for(unsigned int i = 0; i < go_backup_.size(); i++) {
+          go_backup_[i] = false;
+        }
+        go_backup_[1] = go_backup_[2] = go_backup_[4] = go_backup_[5] = true; //cobweb corner
+        go_backup_[7] = go_backup_[go_backup_.size() - 1] = true;
+
         path.poses = goals_;
         path.header.frame_id = global_frame_;
         path.header.stamp = node_->get_clock()->now();
@@ -250,11 +237,18 @@ namespace nav2_behavior_tree
         goal.header.stamp = node_->get_clock()->now();
         goal.header.frame_id = global_frame_;
         setOutput("goal", goal);
-        if(i == 2) {
+        if(i > 0) {
+            geometry_msgs::msg::PoseStamped start = goals_[i - 1];
+          start.header.stamp = node_->get_clock()->now();
+          start.header.frame_id = global_frame_;
+          setOutput("start", start);
+        }
+        if(go_backup_[i]) {
           setOutput("is_not_corner", false);
+        } else {
+          setOutput("is_not_corner", true);
         }
         child_node_->executeTick();
-        setOutput("is_not_corner", true);
         while (child_node_->waitValidStatus() == BT::NodeStatus::RUNNING)
         {
           child_node_->executeTick();

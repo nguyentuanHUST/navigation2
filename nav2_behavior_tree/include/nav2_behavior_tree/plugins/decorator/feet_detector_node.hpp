@@ -60,6 +60,9 @@ public:
         "goal",
         "Goal to navigate to"),
       BT::OutputPort<bool>("is_not_corner", "is_not_corner"),
+      BT::OutputPort<geometry_msgs::msg::PoseStamped>(
+        "start","Start pose to create plan"
+      ),
     };
   }
 
@@ -102,6 +105,7 @@ private:
 
 
   std::vector<geometry_msgs::msg::PoseStamped> goals_;
+  std::vector<bool> go_backup_;
   bool goals_calculated_{false};
   int current_goal_index_;
   double robot_width_;
