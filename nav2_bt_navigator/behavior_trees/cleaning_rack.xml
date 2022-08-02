@@ -8,7 +8,7 @@
                 <RateController hz="1.0">
                     <ComputePathToPose goal="{start_point}" path="{path}" planner_id="GridBased"/>
                 </RateController>
-                <FollowPath path="{path}"  controller_id="Pursuit" goal_checker_id="general_goal_checker_precise"/>
+                <FollowPath path="{path}"  controller_id="Teb" goal_checker_id="general_goal_checker_precise"/>
             </PipelineSequence>
             <!-- <Action ID="OffObstacleAvoidance"/> -->
             <Decorator ID="FeetDetector" start="{start}" goal="{next_goal}" is_not_corner="{not_corner}">

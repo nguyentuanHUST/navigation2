@@ -127,7 +127,6 @@ namespace nav2_behavior_tree
         tf2::Vector3 leg10_v(leg0_.point.x - leg1_.point.x, leg0_.point.y - leg1_.point.y, 0);
         tf2::Vector3 leg21_v(leg1_.point.x - leg2_.point.x, leg1_.point.y - leg2_.point.y, 0);
         tf2::Vector3 leg30_v(leg0_.point.x - leg3_.point.x, leg0_.point.y - leg3_.point.y, 0);
-        RCLCPP_INFO(node_->get_logger(),"leg30 %f %f %f", leg30_v.getX(),leg30_v.getY(),leg30_v.getZ() );
         tf2::Vector3 leg2_v(leg2_.point.x, leg2_.point.y, 0);
         tf2::Vector3 leg1_v(leg1_.point.x, leg1_.point.y, 0);
         double yaw = tf2::tf2Angle(leg23_v, tf2::Vector3(1, 0, 0));
@@ -144,7 +143,7 @@ namespace nav2_behavior_tree
         RCLCPP_INFO(node_->get_logger(), "x3 %f", x3);
         // Cobweb cleaning
         {
-          double safety = 0.06;
+          double safety = 0.1;
           tf2::Vector3 delta_23_s = leg23_v / leg23_v.length() *  (x3 + safety);
           tf2::Vector3 delta_23_l = leg23_v - delta_23_s;
           tf2::Vector3 delta_10_s = leg10_v / leg10_v.length() *  (x3 + safety);
@@ -154,7 +153,6 @@ namespace nav2_behavior_tree
             double l = right_side_offset_ + robot_width_ * k;
             tf2::Vector3 delta_2 = leg21_v / leg21_v.length() * l;
             tf2::Vector3 delta_3 = leg30_v / leg30_v.length() * l;
-            RCLCPP_INFO(node_->get_logger(),"delta_3 %f %f %f", delta_3.getX(),delta_3.getY(),delta_3.getZ() );
             if (l > leg21_v.length() - left_side_offset_)
               break;
             tf2::Transform tf = tf2::Transform::getIdentity();
@@ -195,6 +193,7 @@ namespace nav2_behavior_tree
           tf2::toMsg(cobweb_goals[i], goal.pose);
           goals_.push_back(goal);
         }
+        
         for (unsigned int i = 0; i < below_goals_in_legs_frame.size();)
         {
           geometry_msgs::msg::PoseStamped goal;
@@ -215,13 +214,16 @@ namespace nav2_behavior_tree
           goals_.push_back(goal);
           ++i;
         }
+        unsigned int goal_len = goals_.size();
+        geometry_msgs::msg::PoseStamped exit_point = goals_[6 + (goal_len - 6)/8 * 4 + 2];
+        goals_.push_back(exit_point);
         RCLCPP_INFO(node_->get_logger(), "Goals size %d", static_cast<int>(goals_.size()));
         go_backup_.resize(goals_.size());
         for(unsigned int i = 0; i < go_backup_.size(); i++) {
           go_backup_[i] = false;
         }
         go_backup_[1] = go_backup_[2] = go_backup_[4] = go_backup_[5] = true; //cobweb corner
-        go_backup_[7] = go_backup_[go_backup_.size() - 1] = true;
+        go_backup_[7] = go_backup_[go_backup_.size() - 2] = true;
 
         path.poses = goals_;
         path.header.frame_id = global_frame_;
@@ -230,6 +232,7 @@ namespace nav2_behavior_tree
       }
       double last_radius = getInflationRadius();
       reconfigInflationRadius(inflation_radius_);
+      bool last_success = false;
       for (unsigned int i = 0; i < goals_.size(); i++)
       {
         RCLCPP_INFO(node_->get_logger(), "Goals %d", i);
@@ -237,11 +240,19 @@ namespace nav2_behavior_tree
         goal.header.stamp = node_->get_clock()->now();
         goal.header.frame_id = global_frame_;
         setOutput("goal", goal);
-        if(i > 0) {
-            geometry_msgs::msg::PoseStamped start = goals_[i - 1];
+        if(i > 0 && last_success) {
+          geometry_msgs::msg::PoseStamped start = goals_[i - 1];
           start.header.stamp = node_->get_clock()->now();
           start.header.frame_id = global_frame_;
           setOutput("start", start);
+        } else {
+          geometry_msgs::msg::TransformStamped robot_pose = tf_->lookupTransform(global_frame_, 
+            "base_wheel", tf2::TimePointZero, tf2::durationFromSec(1));
+          geometry_msgs::msg::PoseStamped start_pose;
+          start_pose.header.frame_id = global_frame_;
+          start_pose.pose.position.x = robot_pose.transform.translation.x;
+          start_pose.pose.position.y = robot_pose.transform.translation.y;
+          setOutput("start", start_pose);
         }
         if(go_backup_[i]) {
           setOutput("is_not_corner", false);
@@ -253,6 +264,11 @@ namespace nav2_behavior_tree
         {
           child_node_->executeTick();
           // RCLCPP_INFO(node_->get_logger(), "Child node running");
+        }
+        if(child_node_->status() == BT::NodeStatus::FAILURE) {
+          last_success = false;
+        } else {
+          last_success = true;
         }
         RCLCPP_INFO(node_->get_logger(), "Goals %d finish", i);
       }

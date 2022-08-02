@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /TF1
         - /TF1/Frames1
         - /TF1/Tree1
         - /Controller1/VoxelGrid1
@@ -102,14 +101,6 @@ Visualization Manager:
           Value: false
         left_wheel_1:
           Value: false
-        leg_0:
-          Value: true
-        leg_1:
-          Value: false
-        leg_2:
-          Value: false
-        leg_3:
-          Value: true
         lidar_1:
           Value: false
         map:
@@ -128,38 +119,7 @@ Visualization Manager:
       Tree:
         base_scan:
           map:
-            odom:
-              base_footprint:
-                base_link:
-                  base_wheel:
-                    {}
-                  left_wheel_1:
-                    {}
-                  lidar_1:
-                    leg_0:
-                      {}
-                    leg_1:
-                      {}
-                    leg_2:
-                      {}
-                    leg_3:
-                      {}
-                  realsense_link:
-                    camera_link:
-                      camera_depth_frame:
-                        camera_color_frame:
-                          camera_color_optical_frame:
-                            {}
-                        camera_depth_optical_frame:
-                          {}
-                        camera_left_ir_frame:
-                          camera_left_ir_optical_frame:
-                            {}
-                        camera_right_ir_frame:
-                          camera_right_ir_optical_frame:
-                            {}
-                  right_wheel_1:
-                    {}
+            {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -467,8 +427,8 @@ Visualization Manager:
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 0.14529548585414886
-            Min Value: 0.02530481666326523
+            Max Value: 0.159875750541687
+            Min Value: 0.018961209803819656
             Value: true
           Axis: Z
           Channel Name: intensity
@@ -595,10 +555,10 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz_default_plugins/PointStamped
       Color: 204; 41; 204
-      Enabled: false
+      Enabled: true
       History Length: 1
       Name: PointStamped
-      Radius: 0.20000000298023224
+      Radius: 0.10000000149011612
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -606,7 +566,35 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /lookahead_point
-      Value: false
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 239; 41; 41
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /lookahead_collision_arc
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -654,11 +642,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 174.791015625
+      Scale: 66.13319396972656
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 7.651629447937012
-      Y: -1.4045050144195557
+      X: 7.336849212646484
+      Y: -1.7514065504074097
     Saved: ~
 Window Geometry:
   Displays:
