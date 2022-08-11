@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <Fallback>
+                <Sequence>
+                    <Decorator ID="RateController" hz="10">
+                        <Action ID="ComputePathToPose" goal="{start_point}" path="{path}" planner_id="StraightLine"/>
+                    </Decorator>
+                    <Action ID="FollowPath" controller_id="Pursuit" goal_checker_id="general_goal_checker_precise" path="{path}"/>
+                </Sequence>
+                <Sequence>
+                    <Decorator ID="RateController" hz="10">
+                        <Action ID="ComputePathToPose" goal="{start_point}" path="{path}" planner_id="GridBased"/>
+                    </Decorator>
+                    <Action ID="FollowPath" controller_id="Teb" goal_checker_id="general_goal_checker_precise" path="{path}"/>
+                </Sequence>
+            </Fallback>
+            <Action ID="ReconfigureService" param_name="inflation_layer.inflation_radius" param_value="0.1" service_name="local_costmap/local_costmap/set_parameters"/>
+            <Action ID="ReconfigureService" param_name="inflation_layer.inflation_radius" param_value="0.1" service_name="global_costmap/global_costmap/set_parameters"/>
+            <Control ID="RecoveryNode" number_of_retries="5">
+                <Condition ID="IsLegDetected" topic="leg_detection_status"/>
+                <Sequence>
+                    <Action ID="Spin" spin_dist="0.1"/>
+                    <Action ID="Spin" spin_dist="-0.1"/>
+                </Sequence>
+            </Control>
+            <Action ID="GetLegs" legs="{legs}" nums="5"/>
+            <Action ID="GenerateCobWebGoals" cobweb_goals="{cobweb_goals}" legs="{legs}"/>
+            <Decorator ID="DistributeGoal" backup_dist="{backup_dist}" brush_up="false" cobweb="true" current_goal="{goal}" current_start="{start}" goals="{cobweb_goals}" use_beam_alignment="false">
+                <Fallback>
+                    <Sequence>
+                        <Decorator ID="RateController" hz="10">
+                            <Action ID="ComputePathToPose" goal="{goal}" path="{path}" planner_id="StraightLine" start="{start}"/>
+                        </Decorator>
+                        <Action ID="FollowPath" controller_id="Pursuit" goal_checker_id="general_goal_checker" path="{path}"/>
+                        <Action ID="BackUp" backup_dist="{backup_dist}" backup_speed="0.2"/>
+                    </Sequence>
+                    <ForceFailure>
+                        <Action ID="BackUp" backup_dist="{backup_dist}" backup_speed="0.2"/>
+                    </ForceFailure>
+                </Fallback>
+            </Decorator>
+            <Action ID="GenerateZigzagGoals" legs="{legs}" zigzag_goals="{zigzag_goals}"/>
+            <Decorator ID="DistributeGoal" backup_dist="{backup_dist}" brush_up="false" cobweb="false" current_goal="{goal}" current_start="{start}" goals="{zigzag_goals}" use_beam_alignment="false">
+                <Fallback>
+                    <Sequence>
+                        <Decorator ID="RateController" hz="10">
+                            <Action ID="ComputePathToPose" goal="{goal}" path="{path}" planner_id="StraightLine" start="{start}"/>
+                        </Decorator>
+                        <Action ID="FollowPath" controller_id="Pursuit" goal_checker_id="general_goal_checker" path="{path}"/>
+                        <Action ID="BackUp" backup_dist="{backup_dist}" backup_speed="0.2"/>
+                    </Sequence>
+                    <ForceFailure>
+                        <Action ID="BackUp" backup_dist="{backup_dist}" backup_speed="0.2"/>
+                    </ForceFailure>
+                </Fallback>
+            </Decorator>
+            <Action ID="ReconfigureService" param_name="inflation_layer.inflation_radius" param_value="0.4" service_name="local_costmap/local_costmap/set_parameters"/>
+            <Action ID="ReconfigureService" param_name="inflation_layer.inflation_radius" param_value="0.4" service_name="global_costmap/global_costmap/set_parameters"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="BackUp">
+            <input_port name="backup_dist">Distance to backup</input_port>
+            <input_port name="backup_speed">Speed at which to backup</input_port>
+        </Action>
+        <Action ID="ClearEntireCostmap">
+            <input_port name="service_name">Service name</input_port>
+        </Action>
+        <Action ID="ComputePathThroughPoses">
+            <input_port name="goals">Destinations to plan through</input_port>
+            <output_port name="path">Path created by ComputePathToPose node</output_port>
+            <input_port name="planner_id"/>
+            <input_port name="start">Start pose of the path if overriding current robot pose</input_port>
+        </Action>
+        <Action ID="ComputePathToPose">
+            <input_port name="goal">Destination to plan to</input_port>
+            <output_port name="path">Path created by ComputePathToPose node</output_port>
+            <input_port name="planner_id"/>
+            <input_port name="start">Start pose of the path if overriding current robot pose</input_port>
+        </Action>
+        <Action ID="ControllerSelector">
+            <input_port name="default_controller">Default controller of the controller selector</input_port>
+            <output_port name="selected_controller">Name of the selected controller received from the topic subcription</output_port>
+            <input_port name="topic_name">Name of the topic to receive controller selection commands</input_port>
+        </Action>
+        <Decorator ID="DistanceController">
+            <input_port name="distance">Distance</input_port>
+        </Decorator>
+        <Condition ID="DistanceTraveled">
+            <input_port name="distance">Distance to check if passed</input_port>
+            <input_port name="global_frame">reference frame to check in</input_port>
+            <input_port name="robot_base_frame">Robot frame to check relative to global_frame</input_port>
+        </Condition>
+        <Decorator ID="DistributeGoal">
+            <output_port name="backup_dist">Whether go backup or not</output_port>
+            <output_port name="brush_up">Whether to control brush up</output_port>
+            <input_port name="cobweb">Whether cobweb or zigzag</input_port>
+            <output_port name="current_goal">Current goal to publish</output_port>
+            <output_port name="current_start">Current start to publish</output_port>
+            <input_port name="goals">Goals list to publish</input_port>
+            <output_port name="use_beam_alignment">Whether to use camera to align above beam</output_port>
+        </Decorator>
+        <Action ID="DriveOnHeading">
+            <input_port name="dist_to_travel">Distance to travel</input_port>
+            <input_port name="speed">Speed at which to travel</input_port>
+            <input_port name="time_allowance">Allowed time for driving on heading</input_port>
+        </Action>
+        <Action ID="FollowPath">
+            <input_port default="FollowPath" name="controller_id"/>
+            <input_port default="GoalChecker" name="goal_checker_id">Goal checker</input_port>
+            <input_port name="path">Path to follow</input_port>
+        </Action>
+        <Action ID="GenerateCobWebGoals">
+            <output_port name="cobweb_goals">Cobweb goal</output_port>
+            <input_port name="legs">Four legs transform in medium</input_port>
+        </Action>
+        <Action ID="GenerateZigzagGoals">
+            <input_port name="legs">Four legs transform in medium</input_port>
+            <output_port name="zigzag_goals">Zigzag goal</output_port>
+        </Action>
+        <Action ID="GetLegs">
+            <output_port name="legs">Four legs transform in medium</output_port>
+            <input_port name="nums">Number of medium times</input_port>
+        </Action>
+        <Action ID="GoalCheckerSelector">
+            <input_port name="default_goal_checker">Default goal checker of the controller selector</input_port>
+            <output_port name="selected_goal_checker">Name of the selected goal checker received from the topic subcription</output_port>
+            <input_port name="topic_name">Name of the topic to receive goal checker selection commands</input_port>
+        </Action>
+        <Condition ID="GoalReached">
+            <input_port name="goal">Destination</input_port>
+        </Condition>
+        <Condition ID="GoalUpdated"/>
+        <Decorator ID="GoalUpdater">
+            <input_port name="input_goal">Original goal in</input_port>
+            <output_port name="output_goal">Output goal set by subscription</output_port>
+        </Decorator>
+        <Condition ID="InitialPoseReceived"/>
+        <Condition ID="IsBatteryLow">
+            <input_port name="battery_topic">Topic for battery info</input_port>
+            <input_port name="is_voltage">Bool if check based on voltage or total %</input_port>
+            <input_port name="min_battery">Min battery % or voltage before triggering</input_port>
+        </Condition>
+        <Condition ID="IsLegDetected">
+            <input_port name="topic">leg detection topic</input_port>
+        </Condition>
+        <Condition ID="IsStuck"/>
+        <Action ID="NavigateThroughPoses">
+            <input_port name="goals">Goals</input_port>
+        </Action>
+        <Action ID="NavigateToPose">
+            <input_port name="goal">Goal</input_port>
+        </Action>
+        <Control ID="PipelineSequence"/>
+        <Action ID="PlannerSelector">
+            <input_port name="default_planner">Default planner of the planner selector</input_port>
+            <output_port name="selected_planner">Name of the selected planner received from the topic subcription</output_port>
+            <input_port name="topic_name">Name of the topic to receive planner selection commands</input_port>
+        </Action>
+        <Decorator ID="RateController">
+            <input_port name="hz">Rate</input_port>
+        </Decorator>
+        <Action ID="ReconfigureService">
+            <input_port name="param_name">param name</input_port>
+            <input_port name="param_value">param value</input_port>
+            <input_port name="service_name">Service name</input_port>
+        </Action>
+        <Control ID="RecoveryNode">
+            <input_port name="number_of_retries">Number of retries</input_port>
+        </Control>
+        <Action ID="ReinitializeGlobalLocalization"/>
+        <Action ID="RemovePassedGoals">
+            <input_port name="input_goals">Input goals to remove if passed</input_port>
+            <output_port name="output_goals">Set of goals after removing any passed</output_port>
+            <input_port name="radius">Radius tolerance on a goal to consider it passed</input_port>
+        </Action>
+        <Control ID="RoundRobin"/>
+        <Decorator ID="SingleTrigger"/>
+        <Decorator ID="SpeedController">
+            <input_port name="filter_duration">Duration (secs) for velocity smoothing filter</input_port>
+            <input_port name="max_rate">Maximum rate</input_port>
+            <input_port name="max_speed">Maximum speed</input_port>
+            <input_port name="min_rate">Minimum rate</input_port>
+            <input_port name="min_speed">Minimum speed</input_port>
+        </Decorator>
+        <Action ID="Spin">
+            <input_port name="spin_dist">Spin distance</input_port>
+        </Action>
+        <Condition ID="TimeExpired">
+            <input_port name="seconds">Time to check if expired</input_port>
+        </Condition>
+        <Condition ID="TransformAvailable">
+            <input_port name="child">Child frame for transform</input_port>
+            <input_port name="parent">Parent frame for transform</input_port>
+        </Condition>
+        <Action ID="TruncatePath">
+            <input_port name="distance">Distance before goal to truncate</input_port>
+            <input_port name="input_path">Path to truncate</input_port>
+            <output_port name="output_path">Truncated path to utilize</output_port>
+        </Action>
+        <Action ID="Wait">
+            <input_port name="wait_duration">Wait time</input_port>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

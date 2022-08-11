@@ -32,7 +32,6 @@ DriveOnHeadingAction::DriveOnHeadingAction(
   getInput("speed", speed);
   double time_allowance;
   getInput("time_allowance", time_allowance);
-  RCLCPP_INFO(node_->get_logger(), "Drive on head %f %f %f", dist, speed, time_allowance);
   // Populate the input message
   goal_.target.x = dist;
   goal_.target.y = 0.0;
@@ -48,7 +47,6 @@ void DriveOnHeadingAction::on_tick() {
   getInput("speed", speed);
   double time_allowance;
   getInput("time_allowance", time_allowance);
-  RCLCPP_INFO(node_->get_logger(), "Drive on head %f %f %f", dist, speed, time_allowance);
   // Populate the input message
   goal_.target.x = dist;
   goal_.target.y = 0.0;

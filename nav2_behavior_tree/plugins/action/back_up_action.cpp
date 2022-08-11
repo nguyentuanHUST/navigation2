@@ -40,6 +40,16 @@ BackUpAction::BackUpAction(
 
 void BackUpAction::on_tick()
 {
+  double dist;
+  getInput("backup_dist", dist);
+  double speed;
+  getInput("backup_speed", speed);
+
+  // Populate the input message
+  goal_.target.x = dist;
+  goal_.target.y = 0.0;
+  goal_.target.z = 0.0;
+  goal_.speed = speed;
   increment_recovery_count();
 }
 

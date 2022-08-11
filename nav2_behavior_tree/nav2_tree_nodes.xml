@@ -7,6 +7,26 @@
 <root>
   <TreeNodesModel>
     <!-- ############################### ACTION NODES ################################# -->
+    <Action ID="ReconfigureService">
+      <input_port name="service_name">Service name</input_port>
+      <input_port name="param_name">param name</input_port>
+      <input_port name="param_value">param value</input_port>
+    </Action>
+    <Action ID="GenerateCobWebGoals">
+      <input_port name="legs">Four legs transform in medium</input_port>
+      <output_port name="cobweb_goals">Cobweb goal</output_port>
+    </Action>
+
+    <Action ID="GenerateZigzagGoals">
+      <input_port name="legs">Four legs transform in medium</input_port>
+      <output_port name="zigzag_goals">Zigzag goal</output_port>
+    </Action>
+    
+    <Action ID="GetLegs">
+      <input_port name="nums">Number of medium times</input_port>
+      <output_port name="legs">Four legs transform in medium</output_port>
+    </Action>
+
     <Action ID="BackUp">
       <input_port name="backup_dist">Distance to backup</input_port>
       <input_port name="backup_speed">Speed at which to backup</input_port>
@@ -92,6 +112,10 @@
     </Action>
 
     <!-- ############################### CONDITION NODES ############################## -->
+    <Condition ID="IsLegDetected">
+      <input_port name="topic">leg detection topic</input_port>
+    </Condition>
+
     <Condition ID="GoalReached">
         <input_port name="goal">Destination</input_port>
     </Condition>
@@ -133,6 +157,16 @@
     <Control ID="RoundRobin"/>
 
     <!-- ############################### DECORATOR NODES ############################## -->
+    <Decorator ID="DistributeGoal">
+      <input_port name="goals">Goals list to publish</input_port>
+      <input_port name="cobweb">Whether cobweb or zigzag</input_port>
+      <output_port name="current_goal">Current goal to publish</output_port>
+      <output_port name="current_start">Current start to publish</output_port>
+      <output_port name="backup_dist">Whether go backup or not</output_port>
+      <output_port name="brush_up">Whether to control brush up</output_port>
+      <output_port name="use_beam_alignment">Whether to use camera to align above beam</output_port>
+    </Decorator>
+    
     <Decorator ID="RateController">
       <input_port name="hz">Rate</input_port>
     </Decorator>

@@ -153,6 +153,25 @@ list(APPEND plugin_libs nav2_feet_detector_bt_node)
 add_library(nav2_is_not_corner_bt_node SHARED plugins/condition/is_not_corner.cpp)
 list(APPEND plugin_libs nav2_is_not_corner_bt_node)
 
+
+add_library(nav2_get_legs_bt_node SHARED plugins/action/get_legs.cpp)
+list(APPEND plugin_libs nav2_get_legs_bt_node) 
+
+add_library(nav2_generate_cobweb_goals_bt_node SHARED plugins/action/generate_cobweb_goals.cpp)
+list(APPEND plugin_libs nav2_generate_cobweb_goals_bt_node) 
+
+add_library(nav2_distribute_goal_bt_node SHARED plugins/decorator/distribute_goal.cpp)
+list(APPEND plugin_libs nav2_distribute_goal_bt_node) 
+
+add_library(nav2_is_leg_detected_bt_node SHARED plugins/condition/is_leg_detected.cpp)
+list(APPEND plugin_libs nav2_is_leg_detected_bt_node)
+
+add_library(nav2_dynamic_reconfigure_service_bt_node SHARED plugins/action/dynamic_reconfigure_service.cpp)
+list(APPEND plugin_libs nav2_dynamic_reconfigure_service_bt_node)
+
+add_library(nav2_generate_zigzag_goals_bt_node SHARED plugins/action/generate_zigzag_goals.cpp)
+list(APPEND plugin_libs nav2_generate_zigzag_goals_bt_node) 
+
 foreach(bt_plugin ${plugin_libs})
   ament_target_dependencies(${bt_plugin} ${dependencies})
   target_compile_definitions(${bt_plugin} PRIVATE BT_PLUGIN_EXPORT)

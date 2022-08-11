@@ -67,7 +67,7 @@ CleanRackNavigator::getDefaultBTFilepath(
     node->declare_parameter<std::string>(
       "default_clean_rack_bt_xml",
       pkg_share_dir +
-      "/behavior_trees/cleaning_rack.xml");
+      "/behavior_trees/cleaning_rack_new.xml");
   }
   
   node->get_parameter("default_clean_rack_bt_xml", default_bt_xml_filename);
