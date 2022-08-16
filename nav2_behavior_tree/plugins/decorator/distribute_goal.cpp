@@ -41,7 +41,7 @@ namespace nav2_behavior_tree
 					setOutput("backup_dist", 0.0);
 				}
 			} else {
-				std::vector<uint32_t> backup_idx{1, static_cast<uint32_t>(goals_.size()) - 2};
+				std::vector<uint32_t> backup_idx{1, static_cast<uint32_t>(goals_.size()) - 1};
 				if(std::count(backup_idx.begin(), backup_idx.end(), goal_index_)) {
 					setOutput("backup_dist", 0.2);
 				} else {

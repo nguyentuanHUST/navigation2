@@ -6,13 +6,13 @@
             <Fallback>
                 <Sequence>
                     <Decorator ID="RateController" hz="10">
-                        <Action ID="ComputePathToPose" goal="{start_point}" path="{path}" planner_id="StraightLine"/>
+                        <Action ID="ComputePathToPose" goal="{start_point}" path="{path}" planner_id="StraightLine" start=""/>
                     </Decorator>
-                    <Action ID="FollowPath" controller_id="Pursuit" goal_checker_id="general_goal_checker_precise" path="{path}"/>
+                    <Action ID="FollowPath" controller_id="Teb" goal_checker_id="general_goal_checker_precise" path="{path}"/>
                 </Sequence>
                 <Sequence>
                     <Decorator ID="RateController" hz="10">
-                        <Action ID="ComputePathToPose" goal="{start_point}" path="{path}" planner_id="GridBased"/>
+                        <Action ID="ComputePathToPose" goal="{start_point}" path="{path}" planner_id="GridBased" start=""/>
                     </Decorator>
                     <Action ID="FollowPath" controller_id="Teb" goal_checker_id="general_goal_checker_precise" path="{path}"/>
                 </Sequence>
@@ -59,6 +59,12 @@
             </Decorator>
             <Action ID="ReconfigureService" param_name="inflation_layer.inflation_radius" param_value="0.4" service_name="local_costmap/local_costmap/set_parameters"/>
             <Action ID="ReconfigureService" param_name="inflation_layer.inflation_radius" param_value="0.4" service_name="global_costmap/global_costmap/set_parameters"/>
+            <Sequence>
+                <Decorator ID="RateController" hz="10">
+                    <Action ID="ComputePathToPose" goal="{start_point}" path="{path}" planner_id="StraightLine" start=""/>
+                </Decorator>
+                <Action ID="FollowPath" controller_id="Teb" goal_checker_id="general_goal_checker_precise" path="{path}"/>
+            </Sequence>
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->

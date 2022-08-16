@@ -35,7 +35,7 @@ namespace nav2_behavior_tree
 		double yaw = tf2::tf2Angle(leg23_v, tf2::Vector3(1, 0, 0));
 		std::vector<tf2::Transform> below_goals_in_legs_frame;
 		std::vector<tf2::Transform> beyond_goals_in_legs_frame;
-		int k = 0;
+		int k = 1;
 		geometry_msgs::msg::TransformStamped base_wheel_to_base_link = tf_->lookupTransform("base_wheel", "base_link", tf2::TimePointZero, tf2::durationFromSec(1));
 		double x1 = base_wheel_to_base_link.transform.translation.x;
 		RCLCPP_INFO(node_->get_logger(), "x1 %f", x1);
@@ -68,7 +68,7 @@ namespace nav2_behavior_tree
 			}
 		}
 
-		for (unsigned int i = 0; i < below_goals_in_legs_frame.size();)
+		for (int i = below_goals_in_legs_frame.size() - 1; i >= 0;)
 		{
 			geometry_msgs::msg::PoseStamped goal;
 			goal.header.frame_id = "map";
@@ -78,7 +78,7 @@ namespace nav2_behavior_tree
 			tf = beyond_goals_in_legs_frame[i];
 			tf2::toMsg(tf, goal.pose);
 			goals_.push_back(goal);
-			if (++i >= below_goals_in_legs_frame.size())
+			if (i-- == 0)
 				break;
 			tf = beyond_goals_in_legs_frame[i];
 			tf2::toMsg(tf, goal.pose);
@@ -86,16 +86,16 @@ namespace nav2_behavior_tree
 			tf = below_goals_in_legs_frame[i];
 			tf2::toMsg(tf, goal.pose);
 			goals_.push_back(goal);
-			++i;
+			i--;
 		}
-		geometry_msgs::msg::PoseStamped exit_point;
-		exit_point.pose.position.x = (beyond_goals_in_legs_frame.front().getOrigin().getX() + 
-			beyond_goals_in_legs_frame.back().getOrigin().getX())/2;
-		exit_point.pose.position.y = (beyond_goals_in_legs_frame.front().getOrigin().getY() + 
-			beyond_goals_in_legs_frame.back().getOrigin().getY())/2;
-			exit_point.pose.orientation.w = 1;
-		exit_point.header.frame_id = "map";
-		goals_.push_back(exit_point);
+		// geometry_msgs::msg::PoseStamped exit_point;
+		// exit_point.pose.position.x = (beyond_goals_in_legs_frame.front().getOrigin().getX() + 
+		// 	beyond_goals_in_legs_frame.back().getOrigin().getX())/2;
+		// exit_point.pose.position.y = (beyond_goals_in_legs_frame.front().getOrigin().getY() + 
+		// 	beyond_goals_in_legs_frame.back().getOrigin().getY())/2;
+		// 	exit_point.pose.orientation.w = 1;
+		// exit_point.header.frame_id = "map";
+		// goals_.push_back(exit_point);
 		setOutput("zigzag_goals", goals_);
 		nav_msgs::msg::Path path;
 		path.poses = goals_;
