@@ -1,0 +1,20 @@
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+		<Sequence>
+			<Fallback>
+				<Sequence>
+					<Decorator ID="RateController" hz="10">
+							<Action ID="ComputePathToPose" goal="{goal}" path="{path}" planner_id="StraightLine" />
+					</Decorator>
+					<Action ID="FollowPath" controller_id="Teb" goal_checker_id="general_goal_checker_precise" path="{path}"/>
+				</Sequence>
+				<Sequence>
+					<Decorator ID="RateController" hz="1">
+							<Action ID="ComputePathToPose" goal="{goal}" path="{path}" planner_id="GridBased"/>
+					</Decorator>
+					<Action ID="FollowPath" controller_id="Teb" goal_checker_id="general_goal_checker_precise" path="{path}"/>
+				</Sequence>
+			</Fallback>
+		</Sequence>
+	</BehaviorTree>
+</root>

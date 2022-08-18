@@ -21,12 +21,15 @@ namespace nav2_behavior_tree
 			try
 			{
 				geometry_msgs::msg::TransformStamped leg_0 = tf_->lookupTransform("map", "leg_0", tf2::TimePointZero, tf2::durationFromSec(1));
-				getMedium(legs[0], n, leg_0);
 				geometry_msgs::msg::TransformStamped leg_1 = tf_->lookupTransform("map", "leg_1", tf2::TimePointZero, tf2::durationFromSec(1));
-				getMedium(legs[1], n, leg_1);
 				geometry_msgs::msg::TransformStamped leg_2 = tf_->lookupTransform("map", "leg_2", tf2::TimePointZero, tf2::durationFromSec(1));
-				getMedium(legs[2], n, leg_2);
 				geometry_msgs::msg::TransformStamped leg_3 = tf_->lookupTransform("map", "leg_3", tf2::TimePointZero, tf2::durationFromSec(1));
+				if(leg_0 == leg_1 || leg_0 == leg_2 || leg_0 == leg_3 || leg_1 == leg_2 || leg_1 == leg_3 || leg_2 == leg_3) {
+					continue;
+				}
+				getMedium(legs[2], n, leg_2);
+				getMedium(legs[1], n, leg_1);
+				getMedium(legs[0], n, leg_0);
 				getMedium(legs[3], n, leg_3);
 				n++;
 			}
